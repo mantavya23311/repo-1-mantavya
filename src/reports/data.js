@@ -4,6 +4,7 @@ import supabase from '../lib/supabaseClient';
 export async function getTransactions(userId) {
   const { data, error } = await supabase
     .from('transactions') // Your table name
+<<<<<<< HEAD
     .select('*');
     if (error) {
       return <div>Error loading transactions: {error.message}</div>;
@@ -20,4 +21,15 @@ export async function getTransactions(userId) {
         </ul>
       </div>
     );
+=======
+    .select('*')
+    .eq('user_id', userId); // Filter by user ID
+
+  if (error) {
+    console.error('Error fetching transactions:', error.message);
+    return [];
+  }
+
+  return data;
+>>>>>>> 7e84877 (Track all untracked files)
 }
