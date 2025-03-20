@@ -9,8 +9,3 @@ export function generatePDF(income, expense) {
   return doc;
 }
 
-const downloadPDF = () => {
-    const doc = generatePDF(5000, 3000);
-    doc.pipe(window.open('', '_blank'));
-    doc.end();
-  };
