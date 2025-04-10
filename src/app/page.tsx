@@ -1,23 +1,19 @@
+import { useEffect, useState } from 'react';
 import supabase from "../lib/supabaseClient";
-export default async function Reports() {
-  const { data, error } = await supabase
-    .from("transactions")
-    .select("*");
+export const useChartData = () => {
+  const [data, setData] = useState([]);
 
-  if (error) {
-    return <div>Error loading transactions: {error.message}</div>;
-  }
+  useEffect(() => {
+    const fetchChartData = async () => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*');
 
-  return (
-    <div>
-      <h1>Financial Reports</h1>
-      <ul>
-        {data.map((transaction) => (
-          <li key={transaction.id}>
-            {transaction.type}: ${transaction.amount}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+      if (!error) setData(data);
+    };
+
+    fetchChartData();
+  }, []);
+
+  return data;
+};
