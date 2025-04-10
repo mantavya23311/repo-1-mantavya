@@ -1,19 +1,21 @@
-import supabase from '../lib/supabaseClient';
+// components/useData.ts (or inside a component)
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
-// Fetch transactions data from Supabase
-export async function getTransactions(userId) {
-  try {
-    const { data, error } = await supabase
-      .from('transactions') // Your table name
-      .select('*')
-      .eq('user_id', userId); // Filter by user ID
+export const useChartData = () => {
+  const [data, setData] = useState([]);
 
-    if (error) throw error;
+  useEffect(() => {
+    const fetchChartData = async () => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*');
 
-    return data || [];
-  } catch (error) {
-    console.error('Error loading transactions:', error.message);
-    return [];
-  }
-}
+      if (!error) setData(data);
+    };
 
+    fetchChartData();
+  }, []);
+
+  return data;
+};
