@@ -1,19 +1,14 @@
-import { useEffect, useState } from 'react';
-import supabase from "../lib/supabaseClient";
-export const useChartData = () => {
-  const [data, setData] = useState([]);
+// app/page.tsx or pages/index.tsx
+import dynamic from 'next/dynamic';
 
-  useEffect(() => {
-    const fetchChartData = async () => {
-      const { data, error } = await supabase
-        .from('transactions')
-        .select('*');
+const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 
-      if (!error) setData(data);
-    };
+export default function Home() {
+  return (
+    <main className="p-8">
+      <h1 className="text-2xl font-bold mb-4">My Supabase Chart</h1>
+      <Chart />
+    </main>
+  );
+}
 
-    fetchChartData();
-  }, []);
-
-  return data;
-};
