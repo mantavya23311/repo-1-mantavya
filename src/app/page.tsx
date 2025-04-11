@@ -1,4 +1,4 @@
-import Chart from '@/src/app/DynamicChartClient';
+import Chart from './src/app/DynamicChartClient';
 
 export default function Page() {
   return (
