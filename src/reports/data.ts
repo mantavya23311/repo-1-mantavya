@@ -1,38 +1,36 @@
-// components/useChartData.ts
-import { useEffect, useState } from 'react';
-import supabase from '@/lib/supabaseClient';
+// components/Chart.tsx
+'use client';
 
-export interface ChartDataPoint {
-  name: string;   // e.g., month name
-  value: number;  // e.g., total sales
-}
+import React from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
+import { useChartData } from './reports/data';
 
-export const useChartData = () => {
-  const [data, setData] = useState<ChartDataPoint[]>([]);
+const Chart = () => {
+  const data = useChartData();
 
-  useEffect(() => {
-    const fetchChartData = async () => {
-      const { data: rows, error } = await supabase
-        .from('reports')  // change to your actual table name
-        .select('month, amount'); // column names in your Supabase table
-
-      if (error) {
-        console.error('Supabase fetch error:', error);
-        return;
-      }
-
-      // Optional: Map DB column names to chart-friendly format
-      const formatted = rows.map((row: any) => ({
-        name: row.month,
-        value: row.amount,
-      }));
-
-      setData(formatted);
-    };
-
-    fetchChartData();
-  }, []);
-
-  return data;
+  return (
+    <div className="w-full h-[300px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="value" stroke="#8884d8" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 };
 
+export default Chart;
