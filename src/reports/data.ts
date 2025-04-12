@@ -20,6 +20,7 @@ export const useChartData = () => {
       const response = await supabase
         .from('reports')
         .select('month, amount');
+      console.log('Supabase fetch response:', response); // This will appear in Vercel logs
 
       if (response.error) {
         console.error('Supabase fetch error:', response.error);
@@ -30,6 +31,7 @@ export const useChartData = () => {
         name: row.month,
         value: row.amount,
       }));
+      console.log('Formatted data:', formatted); // See if array is empty
 
       setData(formatted);
     };
