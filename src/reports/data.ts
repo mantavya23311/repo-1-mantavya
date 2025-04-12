@@ -22,7 +22,7 @@ export const useChartData = () => {
       }
 
       // Optional: Map DB column names to chart-friendly format
-      const formatted = rows.map((row: any) => ({
+      const formatted = rows.map((row: reports) => ({
         name: row.month,
         value: row.amount,
       }));
