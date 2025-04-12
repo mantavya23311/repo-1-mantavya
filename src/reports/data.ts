@@ -20,14 +20,6 @@ export const useChartData = () => {
         console.error('Supabase fetch error:', error);
         return;
       }
-
-      // Optional: Map DB column names to chart-friendly format
-      const formatted = rows.map((row: reports) => ({
-        name: row.month,
-        value: row.amount,
-      }));
-
-      setData(formatted);
     };
 
     fetchChartData();
