@@ -12,7 +12,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { useChartData } from './useChartData';
+import { useChartData } from './data';
 
 const Chart = () => {
   const data = useChartData();
