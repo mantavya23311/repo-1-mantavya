@@ -1,4 +1,4 @@
-// components/useChartData.ts
+// src/reports/data.ts
 import { useEffect, useState } from 'react';
 import supabase from '@/lib/supabaseClient';
 
@@ -7,7 +7,6 @@ export interface ChartDataPoint {
   value: number;  // e.g., total sales
 }
 
-// Define the shape of the data as returned from Supabase
 interface ReportRow {
   month: string;
   amount: number;
@@ -18,17 +17,16 @@ export const useChartData = () => {
 
   useEffect(() => {
     const fetchChartData = async () => {
-      const { data: rows, error } = await supabase
-        .from('reports')  // your Supabase table name
+      const response = await supabase
+        .from('reports')
         .select('month, amount');
 
-      if (error) {
-        console.error('Supabase fetch error:', error);
+      if (response.error) {
+        console.error('Supabase fetch error:', response.error);
         return;
       }
 
-      // Type-safe mapping of database rows to chart data points
-      const formatted = (rows as ReportRow[]).map((row) => ({
+      const formatted = (response.data as ReportRow[]).map((row) => ({
         name: row.month,
         value: row.amount,
       }));
