@@ -7,19 +7,33 @@ export interface ChartDataPoint {
   value: number;  // e.g., total sales
 }
 
+// Define the shape of the data as returned from Supabase
+interface ReportRow {
+  month: string;
+  amount: number;
+}
+
 export const useChartData = () => {
   const [data, setData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     const fetchChartData = async () => {
       const { data: rows, error } = await supabase
-        .from('reports')  // change to your actual table name
-        .select('month, amount'); // column names in your Supabase table
+        .from('reports')  // your Supabase table name
+        .select('month, amount');
 
       if (error) {
         console.error('Supabase fetch error:', error);
         return;
       }
+
+      // Type-safe mapping of database rows to chart data points
+      const formatted = (rows as ReportRow[]).map((row) => ({
+        name: row.month,
+        value: row.amount,
+      }));
+
+      setData(formatted);
     };
 
     fetchChartData();
