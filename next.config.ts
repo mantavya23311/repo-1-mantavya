@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
     config.resolve.fallback = { fs: false, path: false, os: false };
     return config;
   },
+  images: {
+    domains: [
+      'https://pozzgnsaptyuwhrrpebw.supabase.co',
+      'localhost'
+      ],
+  },
 };
 
 export default nextConfig;
