@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import supabase from "../lib/supabaseClient";
-import { Bar, Line, Pie } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 
 // Register ChartJS components
@@ -15,7 +15,7 @@ const RealTimeFinance = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
-      const { data, error } = await supabase.from("finance").select("*");
+      const { data, error } = await supabase.from("finance").select("*").order("created_at", { ascending: false });
       if (error) {
         console.error("Error fetching transactions:", error);
       } else {
@@ -94,8 +94,8 @@ const RealTimeFinance = () => {
 
   const { barData, pieData } = prepareChartData();
 
-  if (loading) return <div>Loading data...</div>;
-  if (transactions.length === 0) return <div>No transactions found</div>;
+  if (loading) return <div className="loading">Loading data...</div>;
+  if (transactions.length === 0) return <div className="no-data">No transactions found</div>;
 
   return (
     <div className="dashboard-container">
@@ -112,7 +112,24 @@ const RealTimeFinance = () => {
                 legend: {
                   position: "top",
                 },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `$${context.raw.toFixed(2)}`;
+                    }
+                  }
+                }
               },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    callback: function(value) {
+                      return `$${value}`;
+                    }
+                  }
+                }
+              }
             }}
           />
         </div>
@@ -127,7 +144,18 @@ const RealTimeFinance = () => {
                 legend: {
                   position: "right",
                 },
-              },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      const label = context.label || '';
+                      const value = context.raw || 0;
+                      const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                      const percentage = Math.round((value / total) * 100);
+                      return `${label}: $${value.toFixed(2)} (${percentage}%)`;
+                    }
+                  }
+                }
+              }
             }}
           />
         </div>
@@ -138,7 +166,11 @@ const RealTimeFinance = () => {
         <ul>
           {transactions.slice(0, 5).map((item) => (
             <li key={item.id}>
-              {item.type}: ${item.amount} - {new Date(item.created_at).toLocaleString()}
+              <span className="transaction-type">{item.type}</span>
+              <span className="transaction-amount">${item.amount.toFixed(2)}</span>
+              <span className="transaction-date">
+                {new Date(item.created_at).toLocaleString()}
+              </span>
             </li>
           ))}
         </ul>
