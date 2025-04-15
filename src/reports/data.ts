@@ -3,40 +3,57 @@ import { useEffect, useState } from 'react';
 import supabase from '@/lib/supabaseClient';
 
 export interface ChartDataPoint {
-  name: string;   // e.g., month name
-  value: number;  // e.g., total sales
+  name: string;
+  value: number;
 }
 
-interface ReportRow {
-  month: string;
-  amount: number;
-}
-
-export const useChartData = () => {
-  const [data, setData] = useState<ChartDataPoint[]>([]);
+export const useFinanceInsights = () => {
+  const [data, setData] = useState({
+    expenses: 0,
+    income: 0,
+    transactions: 0,
+    monthlyBreakdown: [] as ChartDataPoint[],
+  });
 
   useEffect(() => {
-    const fetchChartData = async () => {
-      const response = await supabase
-        .from('reports')
-        .select('month, amount');
-      console.log('Supabase fetch response:', response); // This will appear in Vercel logs
+    const fetchData = async () => {
+      // Fetch total income, expenses, and transactions for a specific user (e.g., user_id = 1)
+      const { data: reports, error } = await supabase
+        .from('Report')
+        .select('income, expense, startdate')
+        .eq('accountid', 1); // Change 1 to dynamic user/account id if needed
 
-      if (response.error) {
-        console.error('Supabase fetch error:', response.error);
+      if (error) {
+        console.error('Error fetching report:', error);
         return;
       }
 
-      const formatted = (response.data as ReportRow[]).map((row) => ({
-        name: row.month,
-        value: row.amount,
-      }));
-      console.log('Formatted data:', formatted); // See if array is empty
+      let totalIncome = 0;
+      let totalExpense = 0;
+      const monthlyMap: Record<string, number> = {};
 
-      setData(formatted);
+      reports?.forEach((report) => {
+        totalIncome += report.income;
+        totalExpense += report.expense;
+
+        const month = new Date(report.startdate).toLocaleString('default', { month: 'short', year: 'numeric' });
+        monthlyMap[month] = (monthlyMap[month] || 0) + report.expense;
+      });
+
+      const { count: transactionCount } = await supabase
+        .from('Transaction')
+        .select('*', { count: 'exact', head: true })
+        .eq('accountid', 1); // Same user/account ID
+
+      setData({
+        expenses: totalExpense,
+        income: totalIncome,
+        transactions: transactionCount || 0,
+        monthlyBreakdown: Object.entries(monthlyMap).map(([name, value]) => ({ name, value })),
+      });
     };
 
-    fetchChartData();
+    fetchData();
   }, []);
 
   return data;
