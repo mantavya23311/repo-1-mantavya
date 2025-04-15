@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     domains: [
-      'https://pozzgnsaptyuwhrrpebw.supabase.co',
+      'https://embgklkvmnarfolxmvrx.supabase.co',
       'localhost'
       ],
   },
